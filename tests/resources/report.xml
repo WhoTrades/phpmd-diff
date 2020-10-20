@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<pmd version="@package_version@" timestamp="2020-10-19T15:22:35+00:00">
+    <file name="/my/custom/path/prefix/path/from/root/to/a/class.php">
+        <violation beginline="12" endline="45" rule="LongClassName" ruleset="Naming Rules" package="+global" externalInfoUrl="https://phpmd.org/rules/naming.html#longclassname" class="The_World_Record_By_Longest_Useless_Class_Name" priority="3">
+            Avoid excessively long class names like The_World_Record_By_Longest_Useless_Class_Name. Keep class name length under 40.
+        </violation>
+        <violation beginline="120" endline="120" rule="AnotherRule" ruleset="Naming Rules" package="+global" externalInfoUrl="https://phpmd.org/rules/naming.html#longclassname" priority="3">
+            Another violation that doesn't exist in diff
+        </violation>
+        <wrongnode>sample content</wrongnode>
+    </file>
+    <file name="/my/custom/path/prefix/path/from/root/to/a/not/changed/class.php">
+        <violation beginline="9" endline="9" rule="StaticAccess" ruleset="Clean Code Rules" externalInfoUrl="https://phpmd.org/rules/cleancode.html#staticaccess" priority="1">
+            Avoid using static access to class 'Template' in method 'html'.
+        </violation>
+    </file>
+    <file name="/my/custom/path/prefix/path/from/root/to/a/non/violation/class.php">
+        <violation beginline="9" endline="9" rule="StaticAccess" ruleset="Clean Code Rules" externalInfoUrl="https://phpmd.org/rules/cleancode.html#staticaccess" priority="1">
+            Avoid using static access to class 'Template' in method 'html'.
+        </violation>
+    </file>
+    <error filename="/my/custom/path/prefix/path/from/root/to/a/broken.class.php" msg="Unexpected token: }, line: 41, col: 5, file: /my/custom/path/prefix/path/from/root/to/a/broken.class.php." />
+    <error filename="/my/custom/path/prefix/path/from/root/to/a/broken.html.php" msg="Unexpected end of token stream in file: /my/custom/path/prefix/path/from/root/to/a/broken.html.php." />
+</pmd>

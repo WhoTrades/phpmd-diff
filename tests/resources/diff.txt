@@ -1,0 +1,51 @@
+diff --git a//path/from/root/to/a/class.php b/path/from/root/to/a/class.php
+index 0ccdaa59481..dfeed5a80b4 100644
+--- a/path/from/root/to/a/class.php
++++ b/path/from/root/to/a/class.php
+@@ -24,10 +24,22 @@ class The_World_Record_By_Longest_Useless_Class_Name extends OtherClass
+
+         $snapshot = $this->getSnapshot($objectId);
+
+-        $messageHeader = $this->config['message_header'];
+-        $messageHeader = \Dictionary::getInstance()->getWord($messageHeader);
++        $networkNames = \Config::getInstance()->networkName;
++        $messageHeaderCode = $this->config['codes']['message_header'];
++        $headerSourceName = $networkNames[$this->config['network_type']];
++        $messageHeader = '';
++
++        if ($messageHeaderCode && $headerSourceName) {
++            $messageHeader .= \Dictionary::getInstance()->getWord(
++                [
++                    $messageHeaderCode,
++                    'source' => $headerSourceName,
++                ],
++                $entity->getEidfgid()
++            );
++        }
+
+-        $messageFooter = $this->config['message_footer'];
++        $messageFooter = $this->config['codes']['message_footer'];
+         $messageFooter = \Dictionary::getInstance()->getWord($messageFooter);
+
+         $messageContent = $this->cleanupContent($entity->getShortText());
+@@ -42,4 +54,4 @@ class The_World_Record_By_Longest_Useless_Class_Name extends OtherClass
+
+         return (object) $response;
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/path/from/root/to/a/non/violation/class.php
+index b041651a351..2dcde6934b1 100755
+--- a/path/from/root/to/a/non/violation/class.php
++++ b/path/from/root/to/a/non/violation/class.php
+@@ -2260,7 +2260,8 @@ class NonViolation implements IFace
+                 $Session->getSID(),
+                 $Session->get(),
+                 \Config::getInstance()->someval,
+-                Request::getTimezoneOffset()
++                Request::getTimezoneOffset(),
++                $Session->get('some_key', null),
+             );
+
+             return $data;

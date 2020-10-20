@@ -1,0 +1,26 @@
+#!/usr/bin/env php
+<?php
+
+use Whotrades\PHPMDDiff\Diff;
+
+$loader = null;
+foreach ([__DIR__ . '/../../autoload.php', __DIR__ . '/../vendor/autoload.php'] as $file) {
+    if (file_exists($file)) {
+        $loader = require $file;
+        break;
+    }
+}
+
+if (!$loader) {
+    die("You need to set up the project dependencies using composer");
+}
+
+$options = (new SebastianBergmann\CliParser\Parser())->parse($argv, 'h', ['path-prefix=']);
+
+$phpmdReportPath = $options[1][0];
+$diffPath = $options[1][1];
+
+$diff = new Diff();
+$report = $diff->execute($phpmdReportPath, $diffPath, $options[0][0][1]);
+
+echo $report->saveXML();
