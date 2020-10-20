@@ -1,6 +1,6 @@
 {
   "name": "whotrades/phpmd-diff",
-  "description": "description",
+  "description": "Tool for creating PHPMD reports, cleared of violations unrelated to the modified lines",
   "minimum-stability": "stable",
   "license": "MIT",
   "authors": [

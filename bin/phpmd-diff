@@ -2,6 +2,7 @@
 <?php
 
 use Whotrades\PHPMDDiff\Diff;
+use Whotrades\PHPMDDiff\Exception\DiffException;
 
 $loader = null;
 foreach ([__DIR__ . '/../../autoload.php', __DIR__ . '/../vendor/autoload.php'] as $file) {
@@ -17,10 +18,22 @@ if (!$loader) {
 
 $options = (new SebastianBergmann\CliParser\Parser())->parse($argv, 'h', ['path-prefix=']);
 
-$phpmdReportPath = $options[1][0];
-$diffPath = $options[1][1];
+$phpmdReportPath = $options[1][0] ?? '';
+$diffPath = $options[1][1] ?? '';
+$pathPrefix = $options[0][0][1] ?? '';
+if (empty($diffPath) || empty($phpmdReportPath)) {
+    echo "Usage: phpmd-diff --path-prefix=/optional/path/prefix /path/to/phpmd/report.xml /path/to/patch.txt\n";
+    exit(1);
+}
 
 $diff = new Diff();
-$report = $diff->execute($phpmdReportPath, $diffPath, $options[0][0][1]);
+try {
+    $report = $diff->execute($phpmdReportPath, $diffPath, $pathPrefix);
+} catch (DiffException $e) {
+    echo "Error occured: " . $e->getMessage();
+    exit(1);
+}
+
 
 echo $report->saveXML();
+exit(0);
