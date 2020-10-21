@@ -5,7 +5,7 @@ use Whotrades\PHPMDDiff\Diff;
 use Whotrades\PHPMDDiff\Exception\DiffException;
 
 $loader = null;
-foreach ([__DIR__ . '/../../autoload.php', __DIR__ . '/../vendor/autoload.php'] as $file) {
+foreach ([__DIR__ . '/../../../autoload.php', __DIR__ . '/../vendor/autoload.php'] as $file) {
     if (file_exists($file)) {
         $loader = require $file;
         break;
