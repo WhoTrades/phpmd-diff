@@ -6,21 +6,18 @@ use DOMDocument;
 use DOMNode;
 use Whotrades\PHPMDDiff\Exception\DiffException;
 
-class XMLFilter extends \Whotrades\PHPMDDiff\AbstractFilter
+class FilterXMLReportByChangelist extends \Whotrades\PHPMDDiff\AbstractFilter
 {
     /**
-     * @param string $patch
-     * @param string $report
-     * @param string $pathPrefix
+     * @param string $reportRaw
+     * @param array $changes
      *
      * @return string
      *
      * @throws DiffException
      */
-    public function execute(string $patchRaw, string $reportRaw, string $pathPrefix): string
+    public function __invoke(string $reportRaw, array $changes): string
     {
-        $changes = $this->getChangesFromPatch($patchRaw, $pathPrefix);
-
         $report = new DOMDocument();
         $report->preserveWhiteSpace = false;
         $report->formatOutput = true;

@@ -6,7 +6,7 @@ use Whotrades\PHPMDDiff\AbstractFilter;
 
 class CustomFilter extends AbstractFilter
 {
-    public function execute(string $patch, string $report, string $pathPrefix): string
+    public function __invoke(string $reportRaw, array $changes): string
     {
         return 'OK';
     }

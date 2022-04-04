@@ -104,7 +104,7 @@ class DiffTest extends TestCase
      *
      * @throws DiffException
      */
-    public function testCustomFilterNotExists()
+    public function testNonExistentCustomFilter()
     {
         $this->expectException(DiffException::class);
         $this->expectExceptionCode(DiffException::ERR_CUSTOM_FILTER);
