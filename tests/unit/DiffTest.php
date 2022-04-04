@@ -113,7 +113,7 @@ class DiffTest extends TestCase
             $this->vfs->getChild('report.xml')->url(),
             $this->vfs->getChild('diff.txt')->url(),
             '/my/custom/path/prefix/',
-            MyBrokenFilter::class
+            NonExistentCustomFilter::class
         );
     }
 
