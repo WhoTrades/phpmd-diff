@@ -16,24 +16,37 @@ if (!$loader) {
     die("You need to set up the project dependencies using composer");
 }
 
-$options = (new SebastianBergmann\CliParser\Parser())->parse($argv, 'h', ['path-prefix=']);
+$options = (new SebastianBergmann\CliParser\Parser())->parse($argv, 'h', ['path-prefix=','filter=']);
 
 $phpmdReportPath = $options[1][0] ?? '';
 $diffPath = $options[1][1] ?? '';
-$pathPrefix = $options[0][0][1] ?? '';
+
+$pathPrefix = '';
+$filterType = 'xml';
+foreach ($options[0] as $option) {
+    switch ($option[0]) {
+        case '--filter':
+            $filterType = $option[1];
+            break;
+        case '--path-prefix':
+            $pathPrefix = $option[1];
+            break;
+    }
+}
+
 if (empty($diffPath) || empty($phpmdReportPath)) {
-    echo "Usage: phpmd-diff --path-prefix=/optional/path/prefix /path/to/phpmd/report.xml /path/to/patch.txt\n";
+    echo "Usage: phpmd-diff --path-prefix=/optional/path/prefix --filter=xml /path/to/phpmd/report.xml /path/to/patch.txt\n";
     exit(1);
 }
 
 $diff = new Diff();
 try {
-    $report = $diff->execute($phpmdReportPath, $diffPath, $pathPrefix);
+    $report = $diff->execute($phpmdReportPath, $diffPath, $pathPrefix, $filterType);
 } catch (DiffException $e) {
     echo "Error occured: " . $e->getMessage();
     exit(1);
 }
 
 
-echo $report->saveXML();
+echo $report;
 exit(0);
