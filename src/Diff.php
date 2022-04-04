@@ -18,7 +18,7 @@ final class Diff
         }
 
         $reportRaw = file_get_contents($phpmdFile);
-        if (!$reportRaw) {
+        if (empty($reportRaw)) {
             throw new DiffException("Can't load PHPMD report.", DiffException::ERR_LOAD_FILE);
         }
 
