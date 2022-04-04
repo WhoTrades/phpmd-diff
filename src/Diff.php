@@ -44,8 +44,8 @@ final class Diff
                     throw new DiffException(sprintf("Custom filter class '%s' not found", $filterType), DiffException::ERR_CUSTOM_FILTER);
                 }
 
-                if (!is_a($filterType, AbstractFilter::class, true)) {
-                    throw new DiffException(sprintf("Custom filter class should extend '%s'", AbstractFilter::class), DiffException::ERR_CUSTOM_FILTER);
+                if (!is_a($filterType, AbstractFilterReportByChangelist::class, true)) {
+                    throw new DiffException(sprintf("Custom filter class should extend '%s'", AbstractFilterReportByChangelist::class), DiffException::ERR_CUSTOM_FILTER);
                 }
 
                 return (new $filterType())($reportRaw, $changes);

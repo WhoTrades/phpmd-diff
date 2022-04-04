@@ -6,7 +6,7 @@ use DOMDocument;
 use DOMNode;
 use Whotrades\PHPMDDiff\Exception\DiffException;
 
-class FilterXMLReportByChangelist extends \Whotrades\PHPMDDiff\AbstractFilter
+class FilterXMLReportByChangelist extends \Whotrades\PHPMDDiff\AbstractFilterReportByChangelist
 {
     /**
      * @param string $reportRaw
