@@ -9,6 +9,8 @@ use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\TestCase;
 use Whotrades\PHPMDDiff\Diff;
 use Whotrades\PHPMDDiff\Exception\DiffException;
+use Whotrades\PHPMDDiff\Tests\Resource\CustomFilter;
+use Whotrades\PHPMDDiff\Tests\Resource\CustomFilterBroken;
 
 class DiffTest extends TestCase
 {
@@ -35,12 +37,12 @@ class DiffTest extends TestCase
     public function testReportFileCannotBeLoaded()
     {
         $this->expectException(DiffException::class);
-        $this->expectExceptionCode(DiffException::ERR_LOAD_FILE);
+        $this->expectExceptionCode(DiffException::ERR_LOAD_REPORT);
 
         $this->vfs->addChild(
             vfsStream::newFile('report_broken.xml')->withContent('<xml BR0K3N />')
         );
-        $this->diff->execute($this->vfs->getChild('report_broken.xml')->url(), $this->vfs->getChild('diff.txt')->url(), '');
+        $this->diff->execute($this->vfs->getChild('report_broken.xml')->url(), $this->vfs->getChild('diff.txt')->url(), '', 'xml');
     }
 
     /**
@@ -49,7 +51,7 @@ class DiffTest extends TestCase
     public function testDiffFileCannotBeLoaded()
     {
         $this->expectException(DiffException::class);
-        $this->expectExceptionCode(DiffException::ERR_LOAD_FILE);
+        $this->expectExceptionCode(DiffException::ERR_LOAD_DIFF);
 
         $this->vfs->addChild(
             vfsStream::newFile('diff_broken.txt')->withContent('#$%DSFGSD')
@@ -57,7 +59,61 @@ class DiffTest extends TestCase
         $this->diff->execute(
             $this->vfs->getChild('report.xml')->url(),
             $this->vfs->getChild('diff_broken.txt')->url(),
-            ''
+            '',
+            'xml'
+        );
+    }
+
+    /**
+     * @return void
+     *
+     * @throws DiffException
+     */
+    public function testCustomFilter()
+    {
+        $result = $this->diff->execute(
+            $this->vfs->getChild('report.xml')->url(),
+            $this->vfs->getChild('diff.txt')->url(),
+            '/my/custom/path/prefix/',
+            CustomFilter::class
+        );
+
+        $this->assertEquals('OK', $result);
+    }
+
+    /**
+     * @return void
+     *
+     * @throws DiffException
+     */
+    public function testCustomFilterWrongInheritance()
+    {
+        $this->expectException(DiffException::class);
+        $this->expectExceptionCode(DiffException::ERR_CUSTOM_FILTER);
+
+        $this->diff->execute(
+            $this->vfs->getChild('report.xml')->url(),
+            $this->vfs->getChild('diff.txt')->url(),
+            '/my/custom/path/prefix/',
+            CustomFilterBroken::class
+        );
+    }
+
+    /**
+     * @return void
+     *
+     * @throws DiffException
+     */
+    public function testCustomFilterNotExists()
+    {
+        $this->expectException(DiffException::class);
+        $this->expectExceptionCode(DiffException::ERR_CUSTOM_FILTER);
+
+        $this->diff->execute(
+            $this->vfs->getChild('report.xml')->url(),
+            $this->vfs->getChild('diff.txt')->url(),
+            '/my/custom/path/prefix/',
+            MyBrokenFilter::class
         );
     }
 
@@ -66,11 +122,15 @@ class DiffTest extends TestCase
      */
     public function testCorrectOutput()
     {
-        $dom = $this->diff->execute(
+        $result = $this->diff->execute(
             $this->vfs->getChild('report.xml')->url(),
             $this->vfs->getChild('diff.txt')->url(),
-            '/my/custom/path/prefix/'
+            '/my/custom/path/prefix/',
+            'xml'
         );
+
+        $dom = new \DOMDocument();
+        $dom->loadXML($result);
 
         // We should have only 1 `file` node left
         $this->assertEquals(1, $dom->getElementsByTagName('file')->count());

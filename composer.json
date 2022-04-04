@@ -25,6 +25,12 @@
       "Whotrades\\PHPMDDiff\\": "src"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Whotrades\\PHPMDDiff\\Tests\\Unit\\": "tests/unit",
+      "Whotrades\\PHPMDDiff\\Tests\\Resource\\": "tests/resources"
+    }
+  },
   "require": {
     "sebastian/diff": "~4.0",
     "sebastian/cli-parser": "~1.0",

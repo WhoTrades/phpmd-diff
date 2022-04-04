@@ -4,100 +4,41 @@ declare(strict_types=1);
 
 namespace Whotrades\PHPMDDiff;
 
-use DOMDocument;
-use DOMNode;
-use SebastianBergmann\Diff\Line;
-use SebastianBergmann\Diff\Parser;
 use Whotrades\PHPMDDiff\Exception\DiffException;
+use Whotrades\PHPMDDiff\Filter\XMLFilter;
 
 final class Diff
 {
-    public function execute(string $phpmdFile, string $patchFile, string $pathPrefix): DOMDocument
+    public function execute(string $phpmdFile, string $patchFile, string $pathPrefix, string $filterType): string
     {
         $patchRaw = @file_get_contents($patchFile);
-        if (empty($patchRaw) || empty($patch = (new Parser())->parse($patchRaw))) {
+
+        if (empty($patchRaw)) {
             throw new DiffException("Can't load patch file.", DiffException::ERR_LOAD_FILE);
         }
 
-        if (substr($pathPrefix, -1, 1) !== DIRECTORY_SEPARATOR) {
-            $pathPrefix .= DIRECTORY_SEPARATOR;
-        }
-
-        $changes = [];
-        foreach ($patch as $diff) {
-            $file = $pathPrefix . substr($diff->getTo(), 2);
-            $changes[$file] = [];
-
-            foreach ($diff->getChunks() as $chunk) {
-                $lineNo = $chunk->getEnd();
-
-                foreach ($chunk->getLines() as $line) {
-                    if ($line->getType() === Line::ADDED) {
-                        $changes[$file][] = $lineNo;
-                    }
-
-                    if ($line->getType() !== Line::REMOVED) {
-                        ++$lineNo;
-                    }
-                }
-            }
-        }
-
-        $report = new DOMDocument();
-        $report->preserveWhiteSpace = false;
-        $report->formatOutput = true;
-        if (!@$report->load($phpmdFile)) {
+        $reportRaw = file_get_contents($phpmdFile);
+        if (!$reportRaw) {
             throw new DiffException("Can't load PHPMD report.", DiffException::ERR_LOAD_FILE);
         }
 
-
-        $root = $report->documentElement;
-        $files = $root->getElementsByTagName('file');
-
-        $filesToRemove = [];
-        $violationsToRemove = [];
-        /** @var DOMNode $file */
-        foreach ($files as $file) {
-            $fileName = (string) $file->attributes->getNamedItem('name')->nodeValue;
-            // If we haven't such file in our diff we can remove it right now.
-            if (!isset($changes[$fileName])) {
-                $filesToRemove[] = $file;
-                continue;
-            }
-
-            $violationNodeCount = 0;
-            /** @var DOMNode $violation */
-            foreach ($file->childNodes as $violation) {
-                if ('violation' !== $violation->nodeName) {
-                    continue;
+        switch ($filterType) {
+            case 'xml':
+                $filter = new XMLFilter();
+                break;
+            default:
+                if (!class_exists($filterType, true)) {
+                    throw new DiffException(sprintf("Custom filter class '%s' not found", $filterType), DiffException::ERR_CUSTOM_FILTER);
                 }
 
-                $violationsLineRage = range(
-                    (int) $violation->attributes->getNamedItem('beginline')->nodeValue,
-                    (int) $violation->attributes->getNamedItem('endline')->nodeValue
-                );
-                if (empty(array_intersect($violationsLineRage, $changes[$fileName]))) {
-                    $violationsToRemove[] = $violation;
-                } else {
-                    ++$violationNodeCount;
+                if (!is_a($filterType, AbstractFilter::class, true)) {
+                    throw new DiffException(sprintf("Custom filter class should extend '%s'", AbstractFilter::class), DiffException::ERR_CUSTOM_FILTER);
                 }
-            }
 
-            // If all `violation` child nodes were removed we also should remove parent node.
-            if (0 == $violationNodeCount) {
-                $filesToRemove[] = $file;
-            }
+                $filter = new $filterType();
         }
 
-        foreach ($violationsToRemove as $violation) {
-            $violation->parentNode->removeChild($violation);
-        }
-        foreach ($filesToRemove as $file) {
-            $file->parentNode->removeChild($file);
-        }
-
-        $report->normalizeDocument();
-        return $report;
+        return $filter->execute($patchRaw, $reportRaw, $pathPrefix);
     }
 
 }
