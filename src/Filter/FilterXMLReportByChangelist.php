@@ -4,9 +4,10 @@ namespace Whotrades\PHPMDDiff\Filter;
 
 use DOMDocument;
 use DOMNode;
+use Whotrades\PHPMDDiff\AbstractFilterReportByChangelist;
 use Whotrades\PHPMDDiff\Exception\DiffException;
 
-class FilterXMLReportByChangelist extends \Whotrades\PHPMDDiff\AbstractFilterReportByChangelist
+class FilterXMLReportByChangelist extends AbstractFilterReportByChangelist
 {
     /**
      * @param string $reportRaw
