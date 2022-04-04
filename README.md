@@ -12,5 +12,5 @@ composer require-dev whotrades/phpmd-diff
 ```bash
 $ git diff HEAD^1 > /path/to/patch.txt
 $ /path/to/phpmd /path/to/sources xml /path/to/rulesets.xml --reportfile report.xml
-$ /path/to/phpmd-diff --path-prefix=/custom/path/prefix /path/to/phpmd/report.xml /path/to/patch.txt 1> /path/to/a/cleaned/report.xml
+$ /path/to/phpmd-diff --path-prefix=/custom/path/prefix --filter=xml /path/to/phpmd/report.xml /path/to/patch.txt 1> /path/to/a/cleaned/report.xml
 ```
